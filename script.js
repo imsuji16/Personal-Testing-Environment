@@ -1,5 +1,8 @@
 function drawPoint(x,y) {
-    ctx.clearRect(0, 0, myCanvas.clientWidth, myCanvas.clientHeight);
+    
+    ctx.strokeStyle = "rgba(214, 224, 243, 1)";
+    ctx.lineWidth = 20;
+    ctx.strokeRect(0, 0, myCanvas.clientWidth, myCanvas.clientHeight);
     ctx.beginPath();
     ctx.arc(x, y, 5, 0, Math.PI * 2);
     ctx.fillStyle = "rgba(255, 128, 128, 1)";
@@ -11,11 +14,12 @@ let pointX = 100;
 let pointY = 100;
 let isDragging = false;
 let offsetX, offsetY;
+let pointYVelocity = 0;
+let pointXVelocity = 0;
+let gravity = 1;
 
 const myCanvas = document.getElementById("myCanvas");
 const ctx = myCanvas.getContext("2d");
-ctx.fillStyle = "rgba(240, 240, 240, 1)";
-ctx.fillRect(0, 0, myCanvas.clientWidth, myCanvas.clientHeight);
 drawPoint(pointX, pointY);
 
 myCanvas.addEventListener('mousedown', (e) => {
@@ -44,3 +48,5 @@ myCanvas.addEventListener('mouseup', () => {
     isDragging = false;
 });
 
+pointX += pointXVelocity;
+pointY += pointYVelocity;
