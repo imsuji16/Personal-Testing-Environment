@@ -5,12 +5,24 @@ body {
     align-items: center;
     height: 100vh;
     background-color: rgb(15, 30, 45);
+    transition: opacity 0.5s ease-in-out;
+}
+
+.invisible {
+    opacity: 0;
+}
+
+.visible {
+    opacity: 1;
 }
 
 .box {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
+    text-align: center;
+    padding: 1vh;
     height: 40vh;
     width: 60vh;
     border: 0.4vh solid rgb(255, 255, 255);
@@ -29,6 +41,7 @@ body {
     cursor: pointer;
     display: flex;
     align-items: center;
+    transform: translateY(175%);
     justify-content: center;
     border-radius: 4vh;
     z-index: 0;
@@ -56,10 +69,33 @@ body {
     z-index: -2;
 } 
 
-.btext {
-    position: relative;
-    z-index: 2;
+.text {
+    position: absolute;
     color: rgb(255, 255, 255);
     font-family: monospace;
+    z-index: 3;
+}
+
+.h1 {
+    font-size: 3vh;
+    top: 31%;
+    max-width: 25%;
+}
+
+.p {
+    margin: 1vh 0;
+    font-size: 1.5vh;
+    top: 39%;
+    text-align: center;
+    max-width: 23%;
+    overflow-wrap: break-word;
+    color: rgb(111, 130, 151);
+}
+
+.btext {
+    color: rgb(255, 255, 255);
+    font-family: monospace;
+    position: relative;
+    z-index: 2;
     font-size: 1.6vh;
 }
