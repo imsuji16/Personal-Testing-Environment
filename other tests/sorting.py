@@ -19,11 +19,18 @@ def bubbleSort(list):
 # Insertion Sort
 def insertionSort(list):
     i = 0
-    for i in range(0, len(list) - 1):
+    numPasses = 0
+    for i in range(0, len(list)):
         n1 = list[i]
-        j = 0
-        for j in range(0, i):
-            j = 1
+        j = i - 1
+        while j >= 0 and n1 < list[j]:
+            list[j+1] = list[j]
+            j -= 1
+        list[j] = n1
+        numPasses += 1
+    return numPasses
+
+            
 
 
 
@@ -38,3 +45,7 @@ for i in range (0, 99):
 copiedData = data.copy()
 numPasses = bubbleSort(copiedData)
 print(f"-BUBBLE SORT-\n{copiedData}\nNumber of Passes: {numPasses}\n")
+
+copiedData = data.copy()
+numPasses = insertionSort(copiedData)
+print(f"-INSERTION SORT-\n{copiedData}\nNumber of Passes: {numPasses}\n")
