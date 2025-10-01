@@ -149,22 +149,12 @@ function drawCursor(dt) {
     ctx.beginPath();
     ctx.arc(cursor.x, cursor.y, cursor.size/2, 0, Math.PI * 2);
     ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(mouseX + cursor.size/1.6 * Math.cos(counter * cursor.speed), mouseY + cursor.size/1.6 * Math.sin(counter * cursor.speed));
-    ctx.lineTo(mouseX + cursor.size/1.8 * Math.cos(counter * cursor.speed), mouseY + cursor.size/1.8 * Math.sin(counter * cursor.speed));
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(mouseX + cursor.size/1.6 * Math.cos(counter * cursor.speed + Math.PI/2), mouseY + cursor.size/1.6 * Math.sin(counter * cursor.speed + Math.PI/2));
-    ctx.lineTo(mouseX + cursor.size/1.8 * Math.cos(counter * cursor.speed + Math.PI/2), mouseY + cursor.size/1.8 * Math.sin(counter * cursor.speed + Math.PI/2));
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(mouseX + cursor.size/1.6 * Math.cos(counter * cursor.speed + Math.PI), mouseY + cursor.size/1.6 * Math.sin(counter * cursor.speed + Math.PI));
-    ctx.lineTo(mouseX + cursor.size/1.8 * Math.cos(counter * cursor.speed + Math.PI), mouseY + cursor.size/1.8 * Math.sin(counter * cursor.speed + Math.PI));
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(mouseX + cursor.size/1.6 * Math.cos(counter * cursor.speed + Math.PI * 1.5), mouseY + cursor.size/1.6 * Math.sin(counter * cursor.speed + Math.PI * 1.5));
-    ctx.lineTo(mouseX + cursor.size/1.8 * Math.cos(counter * cursor.speed + Math.PI * 1.5), mouseY + cursor.size/1.8 * Math.sin(counter * cursor.speed + Math.PI * 1.5));
-    ctx.stroke();
+    for (let i = 0; i < 4; i++) {
+        ctx.beginPath();
+        ctx.moveTo(mouseX + cursor.size/1.6 * Math.cos(counter * cursor.speed + (Math.PI*i/2)), mouseY + cursor.size/1.6 * Math.sin(counter * cursor.speed + (Math.PI*i/2)));
+        ctx.lineTo(mouseX + cursor.size/1.8 * Math.cos(counter * cursor.speed + (Math.PI*i/2)), mouseY + cursor.size/1.8 * Math.sin(counter * cursor.speed + (Math.PI*i/2)));
+        ctx.stroke();
+    }
 }
 
 function resizeCanvas() {
@@ -177,12 +167,19 @@ function drawEnemies(dt) {
         const e = enemyData[i];
         e.hit -= 15 * dt;
         if (e.hit < 0) e.hit = 0;
-        ctx.shadowColor = `rgba(255, ${60 + Math.round(195 * e.hit)}, ${60 + Math.round(195 * e.hit)}, 1)`;
+        ctx.shadowColor = `rgba(255, ${60 + Math.round(195 * e.hit)}, ${60 + Math.round(195 * e.hit)}, 0.5)`;
         ctx.shadowBlur = 25;
         ctx.fillStyle = `rgba(255, ${60 + Math.round(195 * e.hit)}, ${60 + Math.round(195 * e.hit)}, 1)`;
         ctx.beginPath();
         ctx.roundRect(e.x - (e.size/2), e.y - (e.size/2), e.size, e.size, e.size / 5);
         ctx.fill();
+        speed = 100;
+        let playerDir = Math.atan2(player.y - e.y, player.x - e.x);
+        e.x += speed * Math.cos(playerDir) * dt;
+        e.y += speed * Math.sin(playerDir) * dt;
+        const enemyI = findNearestEnemy(e.x, e.y);
+        let enemyDir = Math.atan2(e.y - enemyData[enemyI].y, e.x - enemyData[enemyI].x);
+
         if (e.health < 1) {
             explosionData.push({
                 x: e.x,
@@ -199,6 +196,7 @@ function drawEnemies(dt) {
 }
 
 function drawObjects(dt) {
+    ctx.shadowColor = "rgba(255, 255, 255, 1)";
     for (let i = bulletData.length - 1; i >= 0; i--) {
         const b = bulletData[i];
         ctx.beginPath();
@@ -366,4 +364,6 @@ function gameLoop(timestamp = 0) {
 }
 
 requestAnimationFrame(gameLoop);
-spawnEnemy(width/2, height/2, 0, 30, 0, 3);
+for (let i = 0; i < 11; i ++) {
+    spawnEnemy(width - 100, Math.random() * height, 0, 30, 0, 3);
+}
