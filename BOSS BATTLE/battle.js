@@ -103,7 +103,7 @@ canvas.addEventListener("dash", () => {
     }
 });
 
-function spawnEnemy(x, y, type, size, hit, health) {
+function spawnEnemy(x = width/2, y = height/2, type = 0, size = 30, hit = 0, health = 3, circle = false) {
     enemyData.push({
         x: x,
         y: y,
@@ -111,6 +111,7 @@ function spawnEnemy(x, y, type, size, hit, health) {
         size: size,
         hit: hit,
         health: health,
+        circle: circle,
     });
 }
 
@@ -162,24 +163,59 @@ function resizeCanvas() {
     height = canvas.height = window.innerHeight;
 }
 
+function updateEnemy(e, dt) {
+    let dx = player.x - e.x;
+    let dy = player.y - e.y;
+    let len = Math.hypot(dx, dy);
+    let pDir = Math.atan2(dy, dx);
+    if (len > 0) {
+        dx /= len;
+        dy /= len;
+    } else {
+        dx = 0;
+        dy = 0;
+    }
+    let sepX = 0;
+    let sepY = 0;
+    let sepR = 40;
+    let sepStrength = 10;
+    for (let i = 0; i < enemyData.length; i++) {
+        let other = enemyData[i];
+        if (other !== e) {
+            let edx = e.x - other.x;
+            let edy = e.y - other.y;
+            let elen = Math.hypot(edx, edy);
+
+            if (elen > 0 && elen < sepR) {
+                let push = (sepR - elen) / sepR;
+                sepX += (edx / elen) * push;
+                sepY += (edy / elen) * push;
+            }
+        }
+    }
+
+    let wDir = (Math.random() - 0.5) * 0.2;
+    let wX = Math.cos(wDir);
+    let wY = Math.sin(wDir);
+
+    let finalX = dx + sepX * sepStrength;
+    let finalY = dy + sepY * sepStrength;
+    let finalLen = Math.hypot(finalX, finalY);
+
+    if (finalLen > 0) {
+        finalX = (finalX /= finalLen) * 60 + wX;
+        finalY = (finalY /= finalLen) * 60 + wY;
+    }
+    e.x += finalX * dt;
+    e.y += finalY * dt;
+}
+
 function drawEnemies(dt) {
     for (let i = enemyData.length - 1; i >= 0; i--) {
         const e = enemyData[i];
         e.hit -= 15 * dt;
         if (e.hit < 0) e.hit = 0;
-        ctx.shadowColor = `rgba(255, ${60 + Math.round(195 * e.hit)}, ${60 + Math.round(195 * e.hit)}, 0.5)`;
-        ctx.shadowBlur = 25;
-        ctx.fillStyle = `rgba(255, ${60 + Math.round(195 * e.hit)}, ${60 + Math.round(195 * e.hit)}, 1)`;
-        ctx.beginPath();
-        ctx.roundRect(e.x - (e.size/2), e.y - (e.size/2), e.size, e.size, e.size / 5);
-        ctx.fill();
-        speed = 100;
-        let playerDir = Math.atan2(player.y - e.y, player.x - e.x);
-        e.x += speed * Math.cos(playerDir) * dt;
-        e.y += speed * Math.sin(playerDir) * dt;
-        const enemyI = findNearestEnemy(e.x, e.y);
-        let enemyDir = Math.atan2(e.y - enemyData[enemyI].y, e.x - enemyData[enemyI].x);
-
+        updateEnemy(e, dt);
         if (e.health < 1) {
             explosionData.push({
                 x: e.x,
@@ -192,6 +228,12 @@ function drawEnemies(dt) {
             enemyData.splice(i, 1);
             continue;
         }
+        ctx.shadowColor = `rgba(255, ${60 + Math.round(195 * e.hit)}, ${60 + Math.round(195 * e.hit)}, 0.5)`;
+        ctx.shadowBlur = 25;
+        ctx.fillStyle = `rgba(255, ${60 + Math.round(195 * e.hit)}, ${60 + Math.round(195 * e.hit)}, 1)`;
+        ctx.beginPath();
+        ctx.roundRect(e.x - (e.size/2), e.y - (e.size/2), e.size, e.size, e.size / 5);
+        ctx.fill();
     }
 }
 
@@ -235,11 +277,11 @@ function drawObjects(dt) {
 function drawParticles() {
     ctx.shadowBlur = 25;
     ctx.shadowColor = "rgba(255, 255, 255, 1)";
-    ctx.fillStyle = "rgba(255, 255, 255, 1)";
     for (let i = explosionData.length - 1; i >= 0; i--) {
         ctx.beginPath();
         const exp = explosionData[i];
         if (exp.size > 0) {
+            exp.fillStyle =  `rgba(255, 255, 255, ${exp.tick/15})`
             ctx.arc(exp.x, exp.y, exp.size, 0, Math.PI * 2);
         }
         exp.tick--;
@@ -345,8 +387,8 @@ function gameLoop(timestamp = 0) {
     mouseDir = Math.atan2(mouseY - player.y, mouseX - player.x);
     ctx.clearRect(0, 0, width, height); // clear the canvas
     drawBackground();
-    drawParticles();
     drawEnemies(dt);
+    drawParticles();
     drawObjects(dt);
     drawPlayer();
     drawGun();
@@ -365,5 +407,5 @@ function gameLoop(timestamp = 0) {
 
 requestAnimationFrame(gameLoop);
 for (let i = 0; i < 11; i ++) {
-    spawnEnemy(width - 100, Math.random() * height, 0, 30, 0, 3);
+    spawnEnemy(Math.random() * width, Math.random() * height, 0, 30, 0, 3, 0);
 }
