@@ -19,10 +19,16 @@ function easeOutCubic(val1, val2, min, max, mu) {
 }
 
 function findTerrainForXY(v) {
-    if (v < 0.45) { // water
-        r = 29;
-        g = 175;
-        b = 251;
+    if (v < 0.3) { // deep water
+        r = easeOutCubic(50, 29, 0, 1, v);
+        g = easeOutCubic(119, 175, 0, 1, v);
+        b = easeOutCubic(255, 251, 0, 1, v);
+        return;
+    } 
+    if (v < 0.45) { // shallow water
+        r = easeOutCubic(29, 50, 0.37, 0.45, v);
+        g = easeOutCubic(175, 208, 0.37, 0.45, v);
+        b = easeOutCubic(251, 255, 0.37, 0.45, v);
         return;
     } 
     if (v < 0.5) { // sand to grass gradient
