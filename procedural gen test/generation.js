@@ -9,9 +9,49 @@ const height = canvas.height;
 
 let xVals, yVals, values;
 let colsD, rowsD;
+let r = 0, g = 0, b = 0;
 const simplex = new SimplexNoise();
 
-function generateNoise(w, h, xOffset, yOffset, cellSize, octaves) {
+function easeOutCubic(val1, val2, min, max, mu) {
+    let t = Math.max(0, Math.min(1, (mu - min) / (max - min)));
+    t = 1 - Math.pow((1 - t), 3);
+    return val1 + t * (val2 - val1);
+}
+
+function findTerrainForXY(v) {
+    if (v < 0.45) { // water
+        r = 29;
+        g = 175;
+        b = 251;
+        return;
+    } 
+    if (v < 0.5) { // sand to grass gradient
+        r = easeOutCubic(253, 117, 0.45, 0.6, v);
+        g = easeOutCubic(247, 239, 0.45, 0.6, v);
+        b = easeOutCubic(194, 125, 0.45, 0.6, v);
+        return;
+    }
+    if (v < 0.75) { // grass to trees gradient
+        r = easeOutCubic(117, 20, 0.6, 0.75, v);
+        g = easeOutCubic(239, 180, 0.6, 0.75, v);
+        b = easeOutCubic(125, 141, 0.6, 0.75, v);
+        return;
+    }
+    if (v < 0.9) { // trees to rock gradient
+        r = easeOutCubic(20, 58, 0.67, 0.9, v);
+        g = easeOutCubic(180, 77, 0.67, 0.9, v);
+        b = easeOutCubic(141, 91, 0.67, 0.9, v);
+        return;
+    }
+    if (v < 1) { // snowcapped peak gradient
+        r = easeOutCubic(189, 255, 0.94, 1, v);
+        g = easeOutCubic(227, 255, 0.94, 1, v);
+        b = easeOutCubic(255, 255, 0.94, 1, v);
+    }
+
+}
+
+function generateNoise(w, h, cellSize, octaves) {
     const columns = (Math.ceil(w / cellSize));
     const rows = (Math.ceil(h / cellSize));
     colsD = columns;
@@ -38,7 +78,7 @@ function generateNoise(w, h, xOffset, yOffset, cellSize, octaves) {
             for (let i = 0; i < octaves + 1; i++) {
                 total += simplex.noise2D((x * freq) / 200, (y * freq) / 200) * amp;
                 maxAmp += amp;
-                amp /= 2;
+                amp /= 1.5;
                 freq *= 2;
             }
 
@@ -52,34 +92,36 @@ function generateNoise(w, h, xOffset, yOffset, cellSize, octaves) {
             arrayIndex++;
         }
     }
-        const off = document.createElement("canvas");
-        off.width = columns;
-        off.height = rows;
-        const offCtx = off.getContext("2d");
 
-        const imageData = offCtx.createImageData(columns, rows);
-        const data = imageData.data;
+    const off = document.createElement("canvas");
+    const offCtx = off.getContext("2d");
+    off.width = columns;
+    off.height = rows;
 
-        const range = maxV - minV;
-        for (let i = 0; i < arrayCap; i++) {
-            const normalized = (values[i] - minV) / range;
-            const val = normalized * 255;
-            const index = i * 4;
-            data[index] = val;
-            data[index + 1] = val;
-            data[index + 2] = val;
-            data[index + 3] = 255;
+    const imageData = offCtx.createImageData(columns, rows);
+    const data = imageData.data;
+
+    const range = maxV - minV;
+    for (let i = 0; i < arrayCap; i++) {
+        const normalized = (values[i] - minV) / range;
+        const val = normalized;
+        const index = i * 4;
+        findTerrainForXY(val);
+        data[index] = r;
+        data[index + 1] = g;
+        data[index + 2] = b;
+        data[index + 3] = 255;
     }
 
-    ctx.putImageData(imageData, xOffset, yOffset);
+    offCtx.putImageData(imageData, 0, 0);
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(off, 0, 0, width, height);
 }
-let time = 0, prevTime = 0, pastTime = 0;
+prevTime = 0, pastTime = 0;
 ctx.fillStyle = "black";
 ctx.font = "20px Arial";
 prevTime = Date.now();
-generateNoise(width, height, 0, 0, 1, 2, time);
+generateNoise(width, height, 1, 4);
 pastTime = Date.now() - prevTime;
 
 // DEBUG
@@ -88,5 +130,3 @@ ctx.fillText("Render Time: " + pastTime / 1000 + "s", 20, 60);
 ctx.fillText("Window Size: X: " + width + ", Y: " + height, 20, 90);
 ctx.fillText("Grid Size: X: " + colsD + ", Y: " + rowsD, 20, 120);
 ctx.fillText("Array Length: " + xVals.length, 20, 150);
-
-animate();
