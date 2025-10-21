@@ -82,7 +82,7 @@ function generateNoise(w = 512, h = 512, offX = 0, offY = 0, octaves = 1, realis
         values = new Float32Array(arrayCap);
     }
 
-    // render islands at random angle, distance, radius, and terrain weight (rng() powers to generate different or random numbers for islands)
+    // render islands at random angle, distance, radius, and terrain weight
     const randAngle = mulberry32(hashSeed(seed, 1));
     const randDist = mulberry32(hashSeed(seed, 2));
     const randRadius = mulberry32(hashSeed(seed, 3));
