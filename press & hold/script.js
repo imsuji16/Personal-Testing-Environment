@@ -12,15 +12,6 @@ button.addEventListener("mouseup", () => {
 });
 document.querySelectorAll("#box, #htext, #ptext, #hold").forEach(element => {element.classList.add("visible")});
 
-async function writeTextWithDelay(text, delay = 0, id) {
-    const element = document.getElementById(id)
-    element.textContent = "";
-    for (const ch of text) {
-        element.textContent += ch;
-        await new Promise(res => setTimeout(res, delay));
-    }
-}
-
 function fadeOut(...elements) {
     for (const element of elements) {
         const el = document.getElementById(element)

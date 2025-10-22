@@ -11,12 +11,12 @@ let values;
 let minVal, maxVal, gW, gH, seedVal;
 
 const terrain = [
-    [0, 0.3, [50, 119, 255], [29, 175, 251]],   // deep water
+    [0, 0.3, [50, 119, 255], [29, 175, 251]], // deep water
     [0.3, 0.48, [29, 175, 251], [50, 208, 255]], // shallow water
     [0.48, 0.6, [253, 247, 194], [117, 239, 125]], // sand to grass
-    [0.6, 0.75, [117, 239, 125], [20, 180, 141]],  // grass to forest
-    [0.7, 0.92, [20, 180, 141], [58, 77, 91]],     // forest to rock
-    [0.85, 1, [83, 130, 162], [255, 255, 255]]     // dark snow (rock snow) to snow
+    [0.6, 0.75, [117, 239, 125], [20, 180, 141]], // grass to forest
+    [0.7, 0.92, [20, 180, 141], [58, 77, 91]], // forest to rock
+    [0.85, 1, [83, 130, 162], [255, 255, 255]] // dark snow (rock snow) to snow
 ];
 
 function cubic(t) {
@@ -189,7 +189,7 @@ prevTime = 0, pastTime = 0;
 ctx.fillStyle = "black";
 ctx.font = "20px Arial";
 prevTime = Date.now();
-generateNoise(width, height, width/2, height/2, 8, true, 50, 894588);
+generateNoise(width, height, width/2, height/2, 8, true, 50, 67);
 pastTime = Date.now() - prevTime;
 
 // DEBUG
