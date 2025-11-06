@@ -1,0 +1,60 @@
+:root {
+    --cell-size: 50px;
+    --cols: 20;
+    --rows: 20;
+}
+
+#grid {
+    display: grid;
+    grid-template-columns: repeat(var(--cols), var(--cell-size));
+    grid-template-rows: repeat(var(--rows), var(--cell-size));
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.cell {
+    width: var(--cell-size);
+    height: var(--cell-size);
+    border: 3px solid white;
+    transition: background-color 0.05s;
+}
+
+.cell.alive {
+    background-color: white;
+}
+
+.cell.dead {
+    background-color: black;
+}
+
+.cell.alive:hover {
+    background-color: rgba(205, 205, 205, 1);
+}
+
+.cell.dead:hover {
+    background-color: rgba(50, 50, 50, 1);
+}
+
+html {
+    background-color: rgba(0, 0, 0, 1);
+}
+
+.text {
+    position: absolute;
+    color: white;
+    font-family: monospace, sans-serif;
+    font-size: 28px;
+    margin-right: 20px;
+}
+
+#run {
+    top: 20px;
+    left: 20px;
+}
+
+#gen {
+    top: 60px;
+    left: 20px;
+}
